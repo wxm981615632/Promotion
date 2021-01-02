@@ -1,0 +1,262 @@
+{extend name='common/_container'} {block name="content"}
+<div class="row">
+	<div class="col-sm-12">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content"> 
+				<div class="row row-lg"> 
+					<div class="col-sm-12"> 
+						<div class="row" id="searchGroup">
+							<div class="col-sm-2">
+								<div class="input-group">
+									<div class="input-group-btn">
+										<button data-toggle="dropdown" class="btn btn-white dropdown-toggle" type="button">应用名称</button>
+									</div>
+									<input type="text" autocomplete="off" class="form-control" id="name_s" placeholder="应用名称" />
+								</div>
+							</div>
+							<!-- search end -->
+							<div class="col-sm-1">
+								<button type="button" class="btn btn-success " onclick="CodeGoods.search()" id="">
+									<i class="fa fa-search"></i>&nbsp;搜索
+								</button>
+							</div>
+						</div>
+						<div class="btn-group-sm" id="CodeGoodsTableToolbar" role="group">
+						{if condition="in_array('promotion/Soft.Index/add',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="add" class="btn btn-primary button-margin" onclick="CodeGoods.add()">
+						<i class="fa fa-plus"></i>&nbsp;添加
+						</button>
+						{/if}
+						{if condition="in_array('promotion/Soft.Index/update',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="update" class="btn btn-success button-margin" onclick="CodeGoods.update()">
+						<i class="fa fa-pencil"></i>&nbsp;修改
+						</button>
+						{/if}
+						{if condition="in_array('promotion/Soft.Index/delete',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="delete" class="btn btn-danger button-margin" onclick="CodeGoods.delete()">
+						<i class="fa fa-trash"></i>&nbsp;删除
+						</button>
+						{/if}
+						{if condition="in_array('promotion/Soft.Index/view',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="view" class="btn btn-info button-margin" onclick="CodeGoods.view()">
+						<i class="fa fa-eye"></i>&nbsp;查看详情
+						</button>
+						{/if}
+						{if condition="in_array('promotion/Soft.Index/dumpData',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="dumpData" class="btn btn-warning button-margin" onclick="CodeGoods.dumpData()">
+						<i class="fa fa-download"></i>&nbsp;导出
+						</button>
+						{/if}
+						{if condition="in_array('promotion/Soft.Index/import',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+						<button type="button" id="import" class="btn btn-warning button-margin" onclick="CodeGoods.import()">
+						<i class="fa fa-upload"></i>&nbsp;导入
+						</button>
+						{/if}
+						</div>
+						<table id="CodeGoodsTable" data-mobile-responsive="true" data-click-to-select="true">
+							<thead><tr><th data-field="selectItem" data-checkbox="true"></th></tr></thead>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var CodeGoods = {id: "CodeGoodsTable",seItem: null,table: null,layerIndex: -1};
+
+	CodeGoods.initColumn = function () {
+ 		return [
+ 			{field: 'selectItem', checkbox: true},
+ 			{title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle',sortable: true},
+ 			{title: '应用名称', field: 'name', visible: true, align: 'left', valign: 'middle',sortable: true},
+ 			{title: '版本号', field: 'version', visible: true, align: 'center', valign: 'middle',sortable: true},
+ 			{title: '文件链接', field: 'file_url', visible: true, align: 'left', valign: 'middle',sortable: true,formatter:CodeGoods.file_urlFormatter},
+ 			{title: '背景图片', field: 'background', visible: true, align: 'center', valign: 'middle',sortable: true,formatter:CodeGoods.backgroundFormatter},
+ 			{title: '操作', field: '', visible: true, align: 'center', valign: 'middle',formatter: 'CodeGoods.buttonFormatter'},
+ 		];
+ 	};
+
+	CodeGoods.buttonFormatter = function(value,row,index) {
+		if(row.id){
+			var str= '';
+			{if condition="in_array('promotion/Soft.Index/update',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+			str += '<button type="button" class="btn btn-success btn-xs" title="修改"  onclick="CodeGoods.update('+row.id+')"><i class="fa fa-pencil"></i>&nbsp;修改</button>&nbsp;';
+			{/if}
+			{if condition="in_array('promotion/Soft.Index/delete',session('promotion.nodes')) || session('promotion.role_id') eq 1"}
+			str += '<button type="button" class="btn btn-danger btn-xs" title="删除"  onclick="CodeGoods.delete('+row.id+')"><i class="fa fa-trash"></i>&nbsp;删除</button>&nbsp;';
+			{/if}
+			return str;
+		}
+	}
+
+	CodeGoods.file_urlFormatter = function(value,row,index) {
+		if(value){
+			return "<a target='_blank' href=\""+value+"\">下载附件</a>";	
+		}
+	}
+
+	CodeGoods.backgroundFormatter = function(value,row,index) {
+		if(value){
+			return "<a href=\"javascript:void(0)\" onclick=\"openImg('"+value+"')\"><img height='30' src="+value+"></a>";	
+		}
+	}
+
+	CodeGoods.formParams = function() {
+		var queryData = {};
+		queryData['offset'] = 0;
+		queryData['name_s'] = $("#name_s").val();
+		return queryData;
+	}
+
+	CodeGoods.check = function () {
+		var selected = $('#' + this.id).bootstrapTable('getSelections');
+		if(selected.length == 0){
+			Feng.info("请先选中表格中的某一记录！");
+			return false;
+		}else{
+			CodeGoods.seItem = selected;
+			return true;
+		}
+	};
+
+	CodeGoods.add = function (value) {
+		var url = location.search;
+		var index = layer.open({type: 2,title: '添加',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/add'+url});
+		this.layerIndex = index;
+		if(!IsPC()){layer.full(index)}
+	}
+
+
+	CodeGoods.update = function (value) {
+		if(value){
+			var index = layer.open({type: 2,title: '修改',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/update?id='+value});
+			if(!IsPC()){layer.full(index)}
+		}else{
+			if (this.check()) {
+				var idx = '';
+				$.each(CodeGoods.seItem, function() {
+					idx += ',' + this.id;
+				});
+				idx = idx.substr(1);
+				if(idx.indexOf(",") !== -1){
+					Feng.info("请选择单条数据！");
+					return false;
+				}
+				var index = layer.open({type: 2,title: '修改',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/update?id='+idx});
+				this.layerIndex = index;
+				if(!IsPC()){layer.full(index)}
+			}
+		}
+	}
+
+
+	CodeGoods.delete = function (value) {
+		if(value){
+			Feng.confirm("是否删除选中项？", function () {
+				var ajax = new $ax(Feng.ctxPath + "/Soft.Index/delete", function (data) {
+					if ('00' === data.status) {
+						Feng.success(data.msg);
+						CodeGoods.table.refresh();
+					} else {
+						Feng.error(data.msg);
+					}
+				});
+				ajax.set('id', value);
+				ajax.start();
+			});
+		}else{
+			if (this.check()) {
+				var idx = '';
+				$.each(CodeGoods.seItem, function() {
+					idx += ',' + this.id;
+				});
+				idx = idx.substr(1);
+				Feng.confirm("是否删除选中项？", function () {
+					var ajax = new $ax(Feng.ctxPath + "/Soft.Index/delete", function (data) {
+						if ('00' === data.status) {
+							Feng.success(data.msg,1000);
+							CodeGoods.table.refresh();
+						} else {
+							Feng.error(data.msg,1000);
+						}
+					});
+					ajax.set('id', idx);
+					ajax.start();
+				});
+			}
+		}
+	}
+
+
+	CodeGoods.view = function (value) {
+		if(value){
+			var index = layer.open({type: 2,title: '查看详情',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/view?id='+value});
+			if(!IsPC()){layer.full(index)}
+		}else{
+			if (this.check()) {
+				var idx = '';
+				$.each(CodeGoods.seItem, function() {
+					idx += ',' + this.id;
+				});
+				idx = idx.substr(1);
+				if(idx.indexOf(",") !== -1){
+					Feng.info("请选择单条数据！");
+					return false;
+				}
+				var index = layer.open({type: 2,title: '查看详情',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/view?id='+idx});
+				this.layerIndex = index;
+				if(!IsPC()){layer.full(index)}
+			}
+		}
+	}
+
+
+	CodeGoods.dumpData = function (value) {
+		var select_id = '';
+		if (this.check()){
+			$.each(CodeGoods.seItem, function() {
+				select_id += ',' + this.id;
+			});
+		}
+		select_id = select_id.substr(1);
+		Feng.confirm("是否确定导出记录?", function() {
+			var index = layer.msg('正在导出下载，请耐心等待...', {
+				time : 3600000,
+				icon : 16,
+				shade : 0.01
+			});
+			var idx =[];
+			$("li input:checked").each(function(){
+				idx.push($(this).attr('data-field'));
+			});
+			var queryData = CodeGoods.formParams();
+			window.location.href = Feng.ctxPath + '/Soft.Index/dumpData?action_id=725&' + Feng.parseParam(queryData) + '&' +Feng.parseParam(idx) + '&id=' + select_id;
+			setTimeout(function() {
+				layer.close(index)
+			}, 1000);
+		});
+	}
+
+
+	CodeGoods.import = function (value) {
+		var index = layer.open({type: 2,title: '导入',area: ['500px', '300px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Soft.Index/import'});
+		this.layerIndex = index;
+		if(!IsPC()){layer.full(index)}
+	}
+
+
+	CodeGoods.search = function() {
+		CodeGoods.table.refresh({query : CodeGoods.formParams()});
+	};
+
+	$(function() {
+		var defaultColunms = CodeGoods.initColumn();
+		var url = location.search;
+		var table = new BSTable(CodeGoods.id, Feng.ctxPath+"/Soft.Index/index"+url,defaultColunms,20);
+		table.setPaginationType("server");
+		table.setQueryParams(CodeGoods.formParams());
+		CodeGoods.table = table.init();
+	});
+</script>
+{/block}

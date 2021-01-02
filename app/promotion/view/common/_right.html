@@ -1,0 +1,53 @@
+<div id="page-wrapper" class="gray-bg dashbard-1">
+	<div class="row border-bottom" style="position:relative">
+		<nav class="navbar navbar-static-top page-tab J_menuTabs" role="navigation" style="margin-bottom: -15px;">
+			<ul class="nav navbar-top-links pull-left" style="position:absolute; z-index:2;background:#fff;">
+				<li style="padding:0">
+					<a class="navbar-minimalize" title="关闭左侧导航"><i class="fa fa-bars"></i></a>
+				</li>
+				<li style="padding:0; margin-right:2px">
+					<a class="roll-nav roll-left J_tabLeft hidden-xs"><i class="fa fa-backward"></i></a>
+				</li>
+			</ul>
+			<ul  class="nav navbar-top-links pull-left page-tabs-content hidden-xs">
+				<li style="margin-left:80px;" class="active J_menuTab" data-id="{:url('promotion/Index/main')}">
+					<a class="top-menu">后台首页 <i class="fa fa-times-circle"></i></a>
+				</li>
+			</ul>
+		</nav>
+		<ul class="nav navbar-top-links navbar-right" style="position:absolute; right:0; top:0; z-index:9999; background:#fff">
+				<li class="dropdown hidden-xs" onclick="fullScreen()">
+					<a class="count-info" href="#" title="全屏">
+						<i class="glyphicon glyphicon-fullscreen"></i>
+					</a>
+				</li>
+				<li class="dropdown hidden-xs" id="cache">
+					<a class="count-info" href="#" title="清除缓存">
+						<i class="glyphicon glyphicon-trash"></i>
+					</a>
+				</li>
+				<li class="dropdown">
+					<div data-toggle="dropdown" data-hover="dropdown" style="cursor:pointer;">
+					<img src="{:config('xhadmin.site_logo')}" width="28" height="28" style="border-radius:50%; margin-right:5px;">
+						{:session('promotion.username')} <span class="caret"></span>
+					</div>
+					<ul class="dropdown-menu animated fadeInRight m-t-xs" style="margin-top:10px;">
+						<li><a href="{:url('promotion/Base/password')}" class="J_menuItem"><i class="fa fa-lock"></i> 修改密码</a></li>
+						<li><a href="{:url('promotion/Login/out')}"><i class="fa fa-sign-out"></i> 安全退出</a></li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a class="right-sidebar-toggle" aria-expanded="false">
+						<i class="fa fa-tasks"></i>
+					</a>
+				</li>
+			</ul>
+	</div>
+	
+	<div class="row J_mainContent" id="content-main">
+		<iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="{:url('promotion/Index/main')}" frameborder="0" data-id="{:url('promotion/Index/main')}" seamless></iframe>
+	</div>
+	<div class="footer gray-bg">
+		<div class="pull-right">&copy; 2018-2020 <a href="http://www.xhadmin.com" target="_blank">xhadmin</a></div>
+	</div>
+</div>

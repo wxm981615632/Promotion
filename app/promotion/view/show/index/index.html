@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{$info.soft}下载</title>
+</head>
+<body>
+    <div >
+        <form action="{:url('start')}" method="post">
+            <input type="hidden" name="code" value="{$info.id}">
+            <div align="center" style="padding-top: 30%">
+                <img src="{$info.logo}" style="width: 180px;height: 180px;">
+                <h1 style="color: white;">{$info.soft} {$info.version}</h1>
+            </div>
+            <div style="padding-top: 30%">
+                <input type="text" placeholder="请输入手机号" class="form_input" name="mobile">
+            </div>
+            <div align="center" style="padding-top: 30%">
+                <button class="button">立即下载</button>
+            </div>
+        </form>
+
+    </div>
+
+</body>
+<style>
+    body {
+        background-image: url({$info.background});
+        height: 100%;
+        background-size: cover;
+    }
+    *{
+        font-size: 40px;
+        font-weight: lighter;
+    }
+    .form_input{
+        background-color: #fff;
+        border: 1px solid rgba(0,0,0,.15);
+        width: 80%;
+        height: 2.8em;
+        padding: 5px 0 5px 10px;
+        border-radius: 55px;
+        margin-left: 10%;
+        text-align: center;
+    }
+    input::-ms-input-placeholder{
+        text-align: center;
+    }
+    input::-webkit-input-placeholder{
+        text-align: center;
+    }
+    .button {
+        background-color: #fff; /* Green */
+        border: none;
+        color: black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 40px;
+        width: 40%;
+        height: 2.8em;
+        line-height: 2.8em;
+        border-radius: 20px;
+    }
+</style>
+</html>
