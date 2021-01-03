@@ -35,6 +35,11 @@ class Index extends BaseController {
     }
 
     public function start(){
+        $user_agent = Request::header('user-agent');
+        if (strpos($user_agent, 'MicroMessenger') !== false) {
+            // 微信浏览器禁止提交
+            return $this->error("请使用非微信浏览器打开");
+        }
         $code = input('param.code');
         $id = $code;
         $mobile = input('param.mobile');
@@ -53,7 +58,7 @@ class Index extends BaseController {
             'soft_id'=>$info['soft_id'],
             'mobile'=>$mobile,
             'create_time'=>time(),
-            'str_ua'=>Request::header('user-agent'),
+            'str_ua'=>$user_agent,
             'str_ip'=>$ip,
         ]);
         $soft = Db::name('promotion_soft')->where('id',$info['soft_id'])->find();
