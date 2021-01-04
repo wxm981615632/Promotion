@@ -1,7 +1,7 @@
 <?php 
 /*
  module:		统计报表
- create_time:	2021-01-02 14:05:56
+ create_time:	2021-01-02 14:49:20
  author:		
  contact:		
 */
@@ -41,7 +41,7 @@ class Record extends Admin {
 			$field = '';
 			$orderby = ($sort && $order) ? $sort.' '.$order : 'id desc';
 
-			$sql = 'select a.id,b.realname user,c.name soft,a.mobile,a.create_time from cd_promotion_record a,cd_promotion_user b,cd_promotion_soft c where a.user_id=b.id and a.soft_id=c.id';
+			$sql = 'select a.id,b.realname user,c.name soft,a.mobile,a.create_time,a.str_ua,a.str_ip from cd_promotion_record a,cd_promotion_user b,cd_promotion_soft c where a.user_id=b.id and a.soft_id=c.id';
 			$limit = ($page-1) * $limit.','.$limit;
 			$res = \xhadmin\CommonService::loadList($sql,formatWhere($where),$limit,$orderby);
 			return json($res);
@@ -53,7 +53,7 @@ class Record extends Admin {
 		if (!$this->request->isPost()){
 			return view('add');
 		}else{
-			$postField = 'user_id,soft_id,mobile,create_time';
+			$postField = 'user_id,soft_id,mobile,create_time,str_ua,str_ip';
 			$data = $this->request->only(explode(',',$postField),'post',null);
 			$res = RecordService::add($data);
 			return json(['status'=>'00','msg'=>'添加成功']);
@@ -68,7 +68,7 @@ class Record extends Admin {
 			$this->view->assign('info',checkData(RecordModel::find($id)));
 			return view('update');
 		}else{
-			$postField = 'id,user_id,soft_id,mobile,create_time';
+			$postField = 'id,user_id,soft_id,mobile,create_time,str_ua,str_ip';
 			$data = $this->request->only(explode(',',$postField),'post',null);
 			$res = RecordService::update($data);
 			return json(['status'=>'00','msg'=>'修改成功']);
@@ -101,14 +101,10 @@ class Record extends Admin {
 		$where['id'] = ['in',$this->request->param('id', '', 'serach_in')];
 
 		try {
-			//此处读取前端传过来的 表格勾选的显示字段
-			$fieldInfo = [];
-			for($j=0; $j<100;$j++){
-				$fieldInfo[] = $this->request->param($j);
-			}
-			$list = RecordModel::where(formatWhere($where))->order('id desc')->select();
-			if(empty($list)) throw new Exception('没有数据');
-			RecordService::dumpData(htmlOutList($list),filterEmptyArray(array_unique($fieldInfo)));
+			$sql = 'select a.id,b.realname user,c.name soft,a.mobile,a.create_time,a.str_ua,a.str_ip from cd_promotion_record a,cd_promotion_user b,cd_promotion_soft c where a.user_id=b.id and a.soft_id=c.id';
+			$res = \xhadmin\CommonService::loadList($sql,formatWhere($where),config('my.max_dump_data'),$orderby='');
+			if(empty($res['rows'])) throw new Exception('没有数据');
+			RecordService::dumpData(htmlOutList($res['rows']));
 		} catch (\Exception $e) {
 			$this->error($e->getMessage());
 		}

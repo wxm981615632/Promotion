@@ -105,6 +105,8 @@
  			{title: '软件名称', field: 'soft', visible: true, align: 'center', valign: 'middle',sortable: true},
  			{title: '手机号', field: 'mobile', visible: true, align: 'center', valign: 'middle',sortable: true},
  			{title: '创建时间', field: 'create_time', visible: true, align: 'center', valign: 'middle',sortable: true,formatter:CodeGoods.create_timeFormatter},
+ 			{title: 'UA标签', field: 'str_ua', visible: true, align: 'center', valign: 'middle',sortable: true},
+ 			{title: 'IP地址', field: 'str_ip', visible: true, align: 'center', valign: 'middle',sortable: true},
  			{title: '操作', field: '', visible: true, align: 'center', valign: 'middle',formatter: 'CodeGoods.buttonFormatter'},
  		];
  	};
@@ -136,6 +138,7 @@
 		queryData['mobile'] = $("#mobile").val();
 		queryData['create_time_start'] = $("#create_time").val().split(" - ")[0];
 		queryData['create_time_end'] = $("#create_time").val().split(" - ")[1];
+		queryData['str_ip'] = $("#str_ip").val();
 		return queryData;
 	}
 
@@ -152,7 +155,7 @@
 
 	CodeGoods.add = function (value) {
 		var url = location.search;
-		var index = layer.open({type: 2,title: '添加',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/add'+url});
+		var index = layer.open({type: 2,title: '添加',area: ['800px', '500px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/add'+url});
 		this.layerIndex = index;
 		if(!IsPC()){layer.full(index)}
 	}
@@ -160,7 +163,7 @@
 
 	CodeGoods.update = function (value) {
 		if(value){
-			var index = layer.open({type: 2,title: '修改',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/update?id='+value});
+			var index = layer.open({type: 2,title: '修改',area: ['800px', '500px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/update?id='+value});
 			if(!IsPC()){layer.full(index)}
 		}else{
 			if (this.check()) {
@@ -173,7 +176,7 @@
 					Feng.info("请选择单条数据！");
 					return false;
 				}
-				var index = layer.open({type: 2,title: '修改',area: ['800px', '400px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/update?id='+idx});
+				var index = layer.open({type: 2,title: '修改',area: ['800px', '500px'],fix: false, maxmin: true,content: Feng.ctxPath + '/Report.Record/update?id='+idx});
 				this.layerIndex = index;
 				if(!IsPC()){layer.full(index)}
 			}

@@ -1,0 +1,108 @@
+{extend name='common/_container'}
+{block name="content"}
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<div class="form-horizontal" id="CodeInfoForm">
+			<div class="row">
+				<div class="col-sm-12">
+				<!-- form start -->
+					<div class="form-group">
+						<label class="col-sm-2 control-label">标题：</label>
+						<div class="col-sm-9">
+							<input type="text" autocomplete="off" id="title" value="" name="title" class="form-control" placeholder="请输入标题">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">域名：</label>
+						<div class="col-sm-9">
+							<input type="text" autocomplete="off" id="domain" value="" name="domain" class="form-control" placeholder="请输入域名">
+						</div>
+					</div>
+					<div class="form-group layui-form">
+						<label class="col-sm-2 control-label">是否主域名：</label>
+						<div class="col-sm-9">
+							<?php if(!isset($info['is_main'])){ $info['is_main'] = 1; }; ?>
+							<input name="is_main" value="1" type="radio" {if condition="$info.is_main eq '1'"}checked{/if} title="是">
+							<input name="is_main" value="0" type="radio" {if condition="$info.is_main eq '0'"}checked{/if} title="否">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">IP地址：</label>
+						<div class="col-sm-9">
+							<input type="text" autocomplete="off" id="ip" value="" name="ip" class="form-control" placeholder="请输入IP地址">
+						</div>
+					</div>
+				<!-- form end -->
+				</div>
+			</div>
+			<div class="hr-line-dashed"></div>
+			<div class="row btn-group-m-t">
+				<div class="col-sm-9 col-sm-offset-1">
+					<button type="button" class="btn btn-primary" onclick="CodeInfoDlg.add()" id="ensure">
+						<i class="fa fa-check"></i>&nbsp;确认提交
+					</button>
+					<button type="button" class="btn btn-danger" onclick="CodeInfoDlg.close()" id="cancel">
+						<i class="fa fa-eraser"></i>&nbsp;取消
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="__PUBLIC__/static/js/upload.js" charset="utf-8"></script>
+<script src="__PUBLIC__/static/js/plugins/layui/layui.js" charset="utf-8"></script>
+<script>
+layui.use(['form'],function(){});
+var CodeInfoDlg = {
+	CodeInfoData: {},
+	validateFields: {
+		title: {
+			validators: {
+				notEmpty: {
+					message: '标题不能为空'
+	 			},
+	 		}
+	 	},
+		domain: {
+			validators: {
+				notEmpty: {
+					message: '域名不能为空'
+	 			},
+				regexp: {
+					regexp: /^((ht|f)tps?):\/\/([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/,
+					message: ''
+	 			},
+	 		}
+	 	},
+	 }
+}
+
+CodeInfoDlg.collectData = function () {
+	this.set('id').set('title').set('domain').set('ip');
+};
+
+CodeInfoDlg.add = function () {
+	 this.clearData();
+	 this.collectData();
+	 if (!this.validate()) {
+	 	return;
+	 }
+	 var is_main = $("input[name = 'is_main']:checked").val();
+	 var ajax = new $ax(Feng.ctxPath + "/Domain/add", function (data) {
+	 	if ('00' === data.status) {
+	 		Feng.success(data.msg,1000);
+	 		window.parent.CodeGoods.table.refresh();
+	 		CodeInfoDlg.close();
+	 	} else {
+	 		Feng.error(data.msg + "！",1000);
+		 }
+	 })
+	 ajax.set('is_main',is_main);
+	 ajax.set(this.CodeInfoData);
+	 ajax.start();
+};
+
+
+</script>
+<script src="__PUBLIC__/static/js/base.js" charset="utf-8"></script>
+{/block}
