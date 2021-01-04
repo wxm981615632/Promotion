@@ -16,8 +16,13 @@ use think\facade\Request;
 
 class Index extends BaseController {
 
-    private function checkDomain(){
-
+    private function reNoMainDomain($code){
+        $domain_list = Db::name('promotion_domain')->where('is_main',0)->select();
+        if($domain_list){
+            $domain = $domain_list[rand(0,count($domain_list)-1)]['domain'];
+            //http://base.smallchen.com/promotion/Show.index/index?code=1
+            return redirect($domain.'/Show.index/index?code='.$code,301);
+        }
     }
 
     public function index(){
@@ -25,12 +30,7 @@ class Index extends BaseController {
         $domain = Request::root(true);
         $is_main = Db::name('promotion_domain')->where('is_main',1)->where('domain',$domain)->count();
         if($is_main){
-            $domain_list = Db::name('promotion_domain')->where('is_main',0)->select();
-            if($domain_list){
-                $domain = $domain_list[rand(0,count($domain_list)-1)]['domain'];
-                //http://base.smallchen.com/promotion/Show.index/index?code=1
-                return redirect($domain.'/Show.index/index?code='.$code,301);
-            }
+            return $this->reNoMainDomain($code);
         }
 
         $id = $code;
